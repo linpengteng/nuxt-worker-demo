@@ -1,24 +1,43 @@
 import { DurableObject } from "cloudflare:workers";
 
 export class MyDurableObject extends DurableObject {
-	constructor(ctx: DurableObjectState, env: Env) {
-		super(ctx, env);
+	env;
+	state;
+
+	constructor(state: DurableObjectState, env: Env) {
+		super(state, env);
+		this.state = state;
+		this.env = env;
 	}
 
-	async sayHello(name: string): Promise<string> {
-		return `Hello, ${name}!`;
+	async save(name: string): Promise<string> {
+		await this.state.storage.put('name', name);
+		return await this.state.storage.get('name') || 'Anonymous';
+	}
+
+	async say(): Promise<string> {
+		return `Hi, ${await this.state.storage.get('name') || 'Anonymous'}!`;
 	}
 }
 
 export const worker: ExportedHandler<Env> = {
 	async fetch(request, env, _ctx): Promise<Response> {
-		let id: DurableObjectId = env.MY_DURABLE_OBJECT.idFromName(new URL(request.url).pathname);
+		const host = new URL(request.url).host
+		const search = new URL(request.url).search
+		const pathname = new URL(request.url).pathname
+		const name = new URLSearchParams(search).get('name') as string
+		const key = env.MY_DURABLE_OBJECT.idFromName(host);
+		const obj = env.MY_DURABLE_OBJECT.get(key);
 
-		let stub = env.MY_DURABLE_OBJECT.get(id);
+		switch (pathname) {
+			case '/save': {
+				return Response.json({ Saved: await obj.save(name) });
+			}
 
-		let greeting = await stub.sayHello("world");
-
-		return new Response(greeting);
+			default: {
+				return new  Response(await obj.say());
+			}
+		}
 	},
 }
 

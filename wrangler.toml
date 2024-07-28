@@ -1,4 +1,4 @@
-name = "nuxt-worker"
+name = "nuxt-worker-demo"
 main = "src/index.ts"
 compatibility_date = "2024-07-25"
 
