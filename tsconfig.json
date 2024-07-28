@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"lib": [
+			"es2021"
+		],
+		"types": [
+			"@cloudflare/workers-types/2023-07-01"
+		],
+		"target": "es2021",
+		"module": "es2022",
+		"moduleResolution": "node",
+		"noEmit": true,
+		"allowJs": true,
+		"checkJs": false,
+		"isolatedModules": true,
+		"resolveJsonModule": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"strict": true,
+	}
+}
